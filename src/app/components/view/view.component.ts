@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
+import {MandelbrotService} from "../../services/mandelbrot.service";
+import {DOCUMENT} from "@angular/common";
 
 @Component({
   selector: 'app-view',
@@ -6,19 +8,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./view.component.scss']
 })
 export class ViewComponent implements OnInit {
-
   ctx: any;
-  constructor(document: Document) {
+  constructor(@Inject(DOCUMENT) private doc: Document,
+              private mandelbrotService: MandelbrotService) {
   }
 
   ngOnInit(): void {
-    const canvas = document.getElementById('canvas')  as HTMLCanvasElement ;
+    const canvas = this.doc.getElementById('canvas')  as HTMLCanvasElement ;
     debugger
     if(canvas){
-      this.ctx = canvas.getContext("2d");
-      this.ctx.lineTo(150, 25);
-      this.ctx.arc(100,75,50,0,2*Math.PI);
-      this.ctx.stroke();
+      const ctx = canvas.getContext("2d");
+      this.mandelbrotService.getManderbrotSection(ctx,0, 500);
     }
   }
 
