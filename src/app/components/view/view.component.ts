@@ -13,7 +13,15 @@ export class ViewComponent implements OnInit {
               private mandelbrotService: MandelbrotService) {
   }
 
+  async generateSection(){
+    await this.mandelbrotService.workerTest();
+  }
+
   ngOnInit(): void {
+    //TODO create multiple calls
+    this.generateSection();
+
+    //Can be removed
     const canvas = this.doc.getElementById('canvas')  as HTMLCanvasElement ;
     debugger
     if(canvas){
