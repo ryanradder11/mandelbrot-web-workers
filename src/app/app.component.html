@@ -9,7 +9,11 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <p><button mat-button (click)="sidenav.toggle()">sidenav.toggle()</button></p>
+    <section>
+            <button (click)="sidenav.toggle()" mat-mini-fab >
+              <mat-icon>home</mat-icon>
+            </button>
+    </section>
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>
