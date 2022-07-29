@@ -8,13 +8,16 @@ import {DOCUMENT} from "@angular/common";
   styleUrls: ['./view.component.scss']
 })
 export class ViewComponent implements OnInit {
-  ctx: any;
+  ctx: CanvasRenderingContext2D | undefined;
   constructor(@Inject(DOCUMENT) private doc: Document,
               private mandelbrotService: MandelbrotService) {
   }
 
   async generateSection(){
-    await this.mandelbrotService.workerTest();
+    for(let i = 0 ; i< 100 ; i++){
+      await this.mandelbrotService.workerTest(i+'');
+    }
+
   }
 
   ngOnInit(): void {
@@ -23,9 +26,8 @@ export class ViewComponent implements OnInit {
 
     //Can be removed
     const canvas = this.doc.getElementById('canvas')  as HTMLCanvasElement ;
-    debugger
-    if(canvas){
-      const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
+    if(ctx){
       this.mandelbrotService.getManderbrotSection(ctx,0, 500);
     }
   }
