@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
+import {BehaviorSubject} from "rxjs";
+import {MatSelectChange} from "@angular/material/select";
 
 @Injectable({
   providedIn: 'root'
 })
 export class MandelbrotService {
-   maxIterations = 100;
-   public mandelMin = -1;
-   public mandelMax = 1;
-   infinity = 40;
+   maxIterations = new BehaviorSubject<number>(10);
+   public mandelMin = -2.5;
+   public mandelMax = 2.5;
+   infinity = 10;
    pixelSize = 1
    brightness = 0;
    width = 700;
@@ -29,9 +31,13 @@ export class MandelbrotService {
     this.changeMandelMaxMin(-this.zoomModifier)
   }
 
+  setMaxIterations(iterations: number): void{
+    this.maxIterations.next(iterations);
+  }
+
   mapValue = (num: number, in_min: number, in_max: number, out_min: number, out_max: number) => (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 
-  drawManderbrot(ctx: CanvasRenderingContext2D, ){
+  drawMandelbrotSingleThreaded(ctx: CanvasRenderingContext2D, ){
 
     for (let y = 0; y < this.height; y++) {
 
@@ -46,7 +52,7 @@ export class MandelbrotService {
 
         let iterationCount = 0;
 
-        while (iterationCount < this.maxIterations) {
+        while (iterationCount < this.maxIterations.value) {
 
           //Echt component
           let aa = (a * a) - (b * b);
@@ -72,7 +78,7 @@ export class MandelbrotService {
           } else {
 
             //Wel in de set
-            this.brightness = this.mapValue(iterationCount, 0, this.maxIterations, 255, 0);
+            this.brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 0, 200);
             ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
           }
 

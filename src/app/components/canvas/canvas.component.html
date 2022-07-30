@@ -2,9 +2,26 @@
   <mat-card-header>
     <mat-card-title>Mandelbrot</mat-card-title>
     <mat-card-subtitle>
-      <p>mandelMax: {{mandelbrotService.mandelMax}}</p>
-      <p>mandelMin: {{mandelbrotService.mandelMin}}</p>
+      <div>
+        <p>MandelMax: {{mandelbrotService.mandelMax}}</p>
+      </div>
+      <div>
+        <p>MandelMin: {{mandelbrotService.mandelMin}}</p>
+      </div>
+      <div>
+        <p>Max iterations: {{mandelbrotService.maxIterations.value}}</p>
+        <mat-select (selectionChange)="setMaxIterations($event.value)">
+          <mat-option [value]="10">10 iterations</mat-option>
+          <mat-option [value]="25">25 iterations</mat-option>
+          <mat-option [value]="50">50 iterations</mat-option>
+          <mat-option [value]="100">100 iterations</mat-option>
+          <mat-option [value]="150">150 iterations</mat-option>
+          <mat-option [value]="200">200 iterations</mat-option>
+          <mat-option [value]="250">250 iterations</mat-option>
+        </mat-select>
+      </div>
     </mat-card-subtitle>
+
   </mat-card-header>
   <mat-card-content>
     <canvas width="700" height="700" id="canvas"></canvas>
