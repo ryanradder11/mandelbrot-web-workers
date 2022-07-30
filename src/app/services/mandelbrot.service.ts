@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class MandelbrotService {
-   maxIterations = 150;
+   maxIterations = 100;
    mandelMin = -2.5;
    mandelMax = 2.5;
    infinity = 40;
@@ -70,24 +70,24 @@ export class MandelbrotService {
       ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
     }
 
-
   }
 
 
 
 
-  async workerTest(i: string){
-    debugger
-    if (typeof Worker !== 'undefined') {
-      const worker = new Worker(new URL('../webworkers/mandelbrot.worker', import.meta.url),
-        {type: 'module'});
 
-      worker.onmessage = ({data}) => {
-        debugger
-        console.log(`page got message: ${data}`);
-      };
-
-      worker.postMessage('worker' + i + 'finished computation');
-    }
-  }
+  // async workerTest(i: string){
+  //   debugger
+  //   if (typeof Worker !== 'undefined') {
+  //     const worker = new Worker(new URL('../webworkers/mandelbrot.worker', import.meta.url),
+  //       {type: 'module'});
+  //
+  //     worker.onmessage = ({data}) => {
+  //       debugger
+  //       console.log(`page got message: ${data}`);
+  //     };
+  //
+  //     worker.postMessage('worker' + i + 'finished computation');
+  //   }
+  // }
 }
