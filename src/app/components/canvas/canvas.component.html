@@ -21,7 +21,7 @@
         </mat-select>
       </div>
       <div>
-        <p>Calculation time: {{mandelbrotService.calculationTime | async }} milliseconds</p>
+        <p>Calculation time: {{mandelbrotService.calculationTime | async | millisecondsTransform }} seconds</p>
       </div>
     </mat-card-subtitle>
 

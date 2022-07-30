@@ -41,6 +41,19 @@ export class MandelbrotService {
 
   drawMandelbrotWithWebworkers(ctx: CanvasRenderingContext2D, numberOfWorkers: number){
 
+    const startTime = performance.now();
+
+    const numberOfpixelsPerBatch = Math.round(this.height / numberOfWorkers)
+
+    for (let y = 0; y < this.height; y = y + numberOfpixelsPerBatch) {
+
+      this.workerTest(numberOfpixelsPerBatch, ctx);
+
+    }
+    const endTime = performance.now();
+    const totalTime = endTime - startTime;
+    this.calculationTime.next(totalTime);
+
 
 
   }
@@ -107,20 +120,26 @@ export class MandelbrotService {
 
 
 
+  async workerTest(pixels: number, ctx: CanvasRenderingContext2D){
+    if (typeof Worker !== 'undefined') {
+      const worker = new Worker(new URL('../webworkers/mandelbrot.worker', import.meta.url),
+        {type: 'module'});
 
+      worker.onmessage = ({data}) => {
+        debugger;
+        console.log(`page got message: ${data}`);
+      };
 
-  // async workerTest(i: string){
-  //   debugger
-  //   if (typeof Worker !== 'undefined') {
-  //     const worker = new Worker(new URL('../webworkers/mandelbrot.worker', import.meta.url),
-  //       {type: 'module'});
-  //
-  //     worker.onmessage = ({data}) => {
-  //       debugger
-  //       console.log(`page got message: ${data}`);
-  //     };
-  //
-  //     worker.postMessage('worker' + i + 'finished computation');
-  //   }
-  // }
+      worker.postMessage({
+        pixels: pixels,
+        width: this.width,
+        height: this.height,
+        mandelMin: this.mandelMin,
+        mandelMax: this.mandelMax,
+        maxIterations: this.maxIterations.value,
+        infinity: this.infinity,
+        brightness: this.brightness,
+      });
+    }
+  }
 }

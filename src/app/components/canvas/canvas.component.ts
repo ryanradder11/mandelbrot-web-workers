@@ -24,22 +24,23 @@ export class CanvasComponent implements  AfterViewInit {
 
   zoomIn(){
     this.mandelbrotService.zoomin();
-    if (this.ctx) {
-      this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
-    }
+    this.drawMandelbrot();
   }
 
   zoomOut(){
     this.mandelbrotService.zoomOut();
-    if (this.ctx) {
-      this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
-    }
+    this.drawMandelbrot();
   }
 
   setMaxIterations(iterations: number){
     this.mandelbrotService.setMaxIterations(iterations);
+    this.drawMandelbrot();
+  }
+
+  private drawMandelbrot(): void{
     if (this.ctx) {
-      this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
+      // this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
+      this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, 1);
     }
   }
 
@@ -84,7 +85,7 @@ export class CanvasComponent implements  AfterViewInit {
     this.ctx = ctx;
     if(ctx){
       //TODO Timeout or card will not load
-      setTimeout(() => this.mandelbrotService.drawMandelbrotSingleThreaded(ctx), 1);
+      setTimeout(() => this.drawMandelbrot());
     }
   }
 
