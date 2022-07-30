@@ -20,6 +20,9 @@
           <mat-option [value]="250">250 iterations</mat-option>
         </mat-select>
       </div>
+      <div>
+        <p>Calculation time: {{mandelbrotService.calculationTime | async }} milliseconds</p>
+      </div>
     </mat-card-subtitle>
 
   </mat-card-header>

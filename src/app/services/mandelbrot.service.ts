@@ -7,6 +7,8 @@ import {MatSelectChange} from "@angular/material/select";
 })
 export class MandelbrotService {
    maxIterations = new BehaviorSubject<number>(10);
+   calculationTime = new BehaviorSubject<number>(0);
+
    public mandelMin = -2.5;
    public mandelMax = 2.5;
    infinity = 10;
@@ -37,7 +39,15 @@ export class MandelbrotService {
 
   mapValue = (num: number, in_min: number, in_max: number, out_min: number, out_max: number) => (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 
-  drawMandelbrotSingleThreaded(ctx: CanvasRenderingContext2D, ){
+  drawMandelbrotWithWebworkers(ctx: CanvasRenderingContext2D, numberOfWorkers: number){
+
+
+
+  }
+
+  drawMandelbrotSingleThreaded(ctx: CanvasRenderingContext2D ){
+
+    const startTime = performance.now();
 
     for (let y = 0; y < this.height; y++) {
 
@@ -84,10 +94,14 @@ export class MandelbrotService {
 
           iterationCount++;
         }
+        ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
         ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
       }
       ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
     }
+    const endTime = performance.now();
+    const totalTime = endTime - startTime;
+    this.calculationTime.next(totalTime);
 
   }
 
