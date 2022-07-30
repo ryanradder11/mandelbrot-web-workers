@@ -12,8 +12,9 @@
         <p>Max iterations: {{mandelbrotService.maxIterations.value}}</p>
         <mat-select (selectionChange)="setMaxIterations($event.value)">
           <mat-option [value]="10">10 iterations</mat-option>
+          <mat-option [value]="15">15 iterations</mat-option>
           <mat-option [value]="25">25 iterations</mat-option>
-          <mat-option [value]="50">50 iterations</mat-option>
+          <mat-option [value]="30">30 iterations</mat-option>
           <mat-option [value]="100">100 iterations</mat-option>
           <mat-option [value]="150">150 iterations</mat-option>
           <mat-option [value]="200">200 iterations</mat-option>

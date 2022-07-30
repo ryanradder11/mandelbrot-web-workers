@@ -6,17 +6,17 @@ import {MatSelectChange} from "@angular/material/select";
   providedIn: 'root'
 })
 export class MandelbrotService {
-   maxIterations = new BehaviorSubject<number>(10);
+   maxIterations = new BehaviorSubject<number>(25);
    calculationTime = new BehaviorSubject<number>(0);
 
    public mandelMin = -2.5;
    public mandelMax = 2.5;
-   infinity = 10;
+   infinity = 400;
    pixelSize = 1
-   brightness = 0;
+   brightness = 1;
    width = 700;
    height = 700;
-   zoomModifier = 0.10;
+   zoomModifier = 0.25;
 
   constructor() { }
 
@@ -43,19 +43,14 @@ export class MandelbrotService {
 
   drawMandelbrotWithWebworkers(ctx: CanvasRenderingContext2D, numberOfWorkers: number){
 
-    const startTime = performance.now();
 
     const numberOfpixelsPerBatch = Math.round(this.height / numberOfWorkers)
 
     for (let y = 0; y < this.height; y = y + numberOfpixelsPerBatch) {
 
-
       this.workerTest(y, numberOfpixelsPerBatch, ctx);
 
     }
-    const endTime = performance.now();
-    const totalTime = endTime - startTime;
-    this.calculationTime.next(totalTime);
 
 
 
@@ -103,13 +98,13 @@ export class MandelbrotService {
           } else {
 
             //Wel in de set
-            this.brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 0, 200);
+            this.brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 255, 50);
             ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
           }
 
           iterationCount++;
         }
-        // ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
+        ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
         ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
       }
       ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
@@ -123,21 +118,26 @@ export class MandelbrotService {
 
 
   async workerTest(initialY: number, pixels: number, ctx: CanvasRenderingContext2D){
+    const startTime = performance.now();
     if (typeof Worker !== 'undefined') {
       const worker = new Worker(new URL('../webworkers/mandelbrot.worker', import.meta.url),
         {type: 'module'});
 
       worker.onmessage = ({data}) => {
-        debugger;
-        const mapPart : { x: number, y: number, inSet: boolean }[] = data;
+        const endTime = performance.now();
+        const totalTime = endTime - startTime;
+        this.calculationTime.next(totalTime);
+        const mapPart : { brightness: number, x: number, y: number, inSet: boolean }[] = data;
         mapPart.map(part => {
           if(part.inSet){
+            ctx.fillStyle = 'rgb(' + part.brightness + ', ' + part.brightness + ', ' + part.brightness + ')';
             ctx.fillRect(part.y * this.pixelSize, part.x * this.pixelSize, this.pixelSize, this.pixelSize);
           }else {
 
           }
         });
-        console.log(`page got message: ${data}`);
+
+        worker.terminate();
       };
 
       worker.postMessage({
