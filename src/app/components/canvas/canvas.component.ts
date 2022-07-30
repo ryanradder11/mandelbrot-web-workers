@@ -8,9 +8,9 @@ import {DOCUMENT} from "@angular/common";
   styleUrls: ['./canvas.component.scss']
 })
 export class CanvasComponent implements  AfterViewInit {
-  ctx: CanvasRenderingContext2D | undefined;
+  ctx: CanvasRenderingContext2D | null | undefined;
   constructor(@Inject(DOCUMENT) private doc: Document,
-              private mandelbrotService: MandelbrotService) {
+              public mandelbrotService: MandelbrotService) {
   }
 
   // async generateSection(){
@@ -20,10 +20,24 @@ export class CanvasComponent implements  AfterViewInit {
   // }
 
 
+
+
+  zoomIn(){
+    this.mandelbrotService.zoomin();
+    if (this.ctx) {
+      this.mandelbrotService.drawManderbrot(this.ctx);
+    }
+  }
+
+  zoomOut(){
+    this.mandelbrotService.zoomOut();
+    if (this.ctx) {
+      this.mandelbrotService.drawManderbrot(this.ctx);
+    }
+  }
+
   ngAfterViewInit(): void {
     const canvas = this.doc.getElementById('canvas')  as HTMLCanvasElement ;
-
-
 
     canvas.addEventListener('mousemove', function (evt: MouseEvent) {
       if(!mousePosDown || mousePosUp) {
@@ -60,6 +74,7 @@ export class CanvasComponent implements  AfterViewInit {
     }
 
     const ctx = canvas.getContext("2d");
+    this.ctx = ctx;
     if(ctx){
       //TODO Timeout or card will not load
       setTimeout(() => this.mandelbrotService.drawManderbrot(ctx), 1);

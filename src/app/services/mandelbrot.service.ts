@@ -5,28 +5,41 @@ import { Injectable } from '@angular/core';
 })
 export class MandelbrotService {
    maxIterations = 100;
-   mandelMin = -2.5;
-   mandelMax = 2.5;
+   public mandelMin = -1;
+   public mandelMax = 1;
    infinity = 40;
    pixelSize = 1
    brightness = 0;
    width = 700;
    height = 700;
+   zoomModifier = 0.10;
 
   constructor() { }
 
+  changeMandelMaxMin(modifier: number){
+    this.mandelMax = this.mandelMax - modifier
+    this.mandelMin = this.mandelMin + modifier
+  }
+
+  zoomin(): void{
+    this.changeMandelMaxMin(this.zoomModifier)
+  }
+
+  zoomOut():void {
+    this.changeMandelMaxMin(-this.zoomModifier)
+  }
+
+  mapValue = (num: number, in_min: number, in_max: number, out_min: number, out_max: number) => (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 
   drawManderbrot(ctx: CanvasRenderingContext2D, ){
-
-    const mapValue = (num: number, in_min: number, in_max: number, out_min: number, out_max: number) => (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 
     for (let y = 0; y < this.height; y++) {
 
       let x;
       for (x = 0; x < this.width; x++) {
 
-        let a = mapValue(y, 0, this.height, this.mandelMin, this.mandelMax);
-        let b = mapValue(x, 0, this.width, this.mandelMin, this.mandelMax);
+        let a = this.mapValue(y, 0, this.height, this.mandelMin, this.mandelMax);
+        let b = this.mapValue(x, 0, this.width, this.mandelMin, this.mandelMax);
 
         let initialA = a;
         let initialB = b;
@@ -59,7 +72,7 @@ export class MandelbrotService {
           } else {
 
             //Wel in de set
-            this.brightness = mapValue(iterationCount, 0, this.maxIterations, 255, 0);
+            this.brightness = this.mapValue(iterationCount, 0, this.maxIterations, 255, 0);
             ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
           }
 
