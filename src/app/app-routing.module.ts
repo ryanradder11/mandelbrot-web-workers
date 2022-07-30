@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {ViewComponent} from "./components/view/view.component";
+import {CanvasComponent} from "./components/canvas/canvas.component";
 
 const routes: Routes = [
   {
     path: 'mandelbrot',
-    component: ViewComponent
+    component: CanvasComponent
   }
 ];
 
