@@ -39,8 +39,10 @@ export class CanvasComponent implements  AfterViewInit {
 
   private drawMandelbrot(): void{
     if (this.ctx) {
+
+      this.ctx.clearRect(0,0, 700, 700);
       // this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
-      this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, 1);
+      this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, 7);
     }
   }
 

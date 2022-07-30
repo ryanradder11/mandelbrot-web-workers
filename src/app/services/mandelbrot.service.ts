@@ -20,6 +20,8 @@ export class MandelbrotService {
 
   constructor() { }
 
+
+
   changeMandelMaxMin(modifier: number){
     this.mandelMax = this.mandelMax - modifier
     this.mandelMin = this.mandelMin + modifier
@@ -47,7 +49,8 @@ export class MandelbrotService {
 
     for (let y = 0; y < this.height; y = y + numberOfpixelsPerBatch) {
 
-      this.workerTest(numberOfpixelsPerBatch, ctx);
+
+      this.workerTest(y, numberOfpixelsPerBatch, ctx);
 
     }
     const endTime = performance.now();
@@ -96,7 +99,6 @@ export class MandelbrotService {
             //Niet in de set
             this.brightness = (iterationCount * 4 ) % 255;
             ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
-            break;
 
           } else {
 
@@ -107,7 +109,7 @@ export class MandelbrotService {
 
           iterationCount++;
         }
-        ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
+        // ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
         ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
       }
       ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
@@ -120,17 +122,26 @@ export class MandelbrotService {
 
 
 
-  async workerTest(pixels: number, ctx: CanvasRenderingContext2D){
+  async workerTest(initialY: number, pixels: number, ctx: CanvasRenderingContext2D){
     if (typeof Worker !== 'undefined') {
       const worker = new Worker(new URL('../webworkers/mandelbrot.worker', import.meta.url),
         {type: 'module'});
 
       worker.onmessage = ({data}) => {
         debugger;
+        const mapPart : { x: number, y: number, inSet: boolean }[] = data;
+        mapPart.map(part => {
+          if(part.inSet){
+            ctx.fillRect(part.y * this.pixelSize, part.x * this.pixelSize, this.pixelSize, this.pixelSize);
+          }else {
+
+          }
+        });
         console.log(`page got message: ${data}`);
       };
 
       worker.postMessage({
+        y: initialY,
         pixels: pixels,
         width: this.width,
         height: this.height,

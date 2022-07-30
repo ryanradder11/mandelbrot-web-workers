@@ -4,7 +4,8 @@ addEventListener('message', ({ data }) => {
 
   const mapValue = (num: number, in_min: number, in_max: number, out_min: number, out_max: number) => (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
   let computedResult: {x: number, y: number, inSet: boolean}[] = [];
-  for (let y = 0; y < data.height; y++ ) {
+  debugger;
+  for (let y = data.y; y < data.height; y++ ) {
     let x;
     for (x = 0; x < data.width; x++) {
 
@@ -13,9 +14,6 @@ addEventListener('message', ({ data }) => {
 
       let initialA = a;
       let initialB = b;
-
-
-
 
       for (let iterationCount = 0;  iterationCount < data.maxIterations; iterationCount++) {
 
@@ -31,7 +29,6 @@ addEventListener('message', ({ data }) => {
 
         //We willen de absolute waarde
         let result = Math.abs(a + b);
-
 
         if(iterationCount === data.maxIterations -1){
 
