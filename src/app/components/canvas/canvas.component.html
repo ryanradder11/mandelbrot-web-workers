@@ -9,9 +9,8 @@
         <p>MandelMin: {{mandelbrotService.mandelMin}}</p>
       </div>
       <div>
-        <p>Max iterations: {{mandelbrotService.maxIterations.value}}</p>
         <mat-label>Max iteraion</mat-label>
-        <mat-select (selectionChange)="setMaxIterations($event.value)">
+        <mat-select [(value)]="selectedIterations" (selectionChange)="setMaxIterations($event.value)">
           <mat-option [value]="10">10 iterations</mat-option>
           <mat-option [value]="15">15 iterations</mat-option>
           <mat-option [value]="25">25 iterations</mat-option>
@@ -24,8 +23,8 @@
       </div>
       <div>
         <mat-label>Webworkers</mat-label>
-        <mat-select (selectionChange)="useWebworkers($event.value)">
-          <mat-option [value]="false">off</mat-option>
+        <mat-select [(value)]="selectedMode" (selectionChange)="useWebworkers($event.value)">
+          <mat-option  [value]="false">off</mat-option>
           <mat-option [value]="true">on</mat-option>
         </mat-select>
       </div>

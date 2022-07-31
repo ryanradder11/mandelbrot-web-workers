@@ -11,6 +11,9 @@ import {BehaviorSubject} from "rxjs";
 export class CanvasComponent implements  AfterViewInit {
   ctx: CanvasRenderingContext2D | null | undefined;
   mode: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  selectedMode= false;
+  selectedIterations = 25;
+
   constructor(@Inject(DOCUMENT) private doc: Document,
               public mandelbrotService: MandelbrotService) {
   }
@@ -49,7 +52,7 @@ export class CanvasComponent implements  AfterViewInit {
 
       this.ctx.clearRect(0,0, 700, 700);
       if(this.mode.value){
-        this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, 7);
+        this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, 4);
       }else {
         this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
       }

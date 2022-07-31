@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 import {MatSelectChange} from "@angular/material/select";
 import {ComputedResult} from "../interfaces/computed-result";
@@ -7,58 +7,50 @@ import {ComputedResult} from "../interfaces/computed-result";
   providedIn: 'root'
 })
 export class MandelbrotService {
-   maxIterations = new BehaviorSubject<number>(25);
-   calculationTime = new BehaviorSubject<number>(0);
+  maxIterations = new BehaviorSubject<number>(25);
+  calculationTime = new BehaviorSubject<number>(0);
 
-   public mandelMin = -2.5;
-   public mandelMax = 2.5;
-   infinity = 9999;
-   pixelSize = 1
-   brightness = 1;
-   width = 700;
-   height = 700;
-   zoomModifier = 0.25;
+  public mandelMin = -2.5;
+  public mandelMax = 2.5;
+  infinity = 9999;
+  pixelSize = 1
+  brightness = 1;
+  width = 700;
+  height = 700;
+  zoomModifier = 0.25;
 
-  constructor() { }
+  constructor() {
+  }
 
 
-
-  changeMandelMaxMin(modifier: number){
+  changeMandelMaxMin(modifier: number) {
     this.mandelMax = this.mandelMax - modifier
     this.mandelMin = this.mandelMin + modifier
   }
 
-  zoomin(): void{
+  zoomin(): void {
     this.changeMandelMaxMin(this.zoomModifier)
   }
 
-  zoomOut():void {
+  zoomOut(): void {
     this.changeMandelMaxMin(-this.zoomModifier)
   }
 
-  setMaxIterations(iterations: number): void{
+  setMaxIterations(iterations: number): void {
     this.maxIterations.next(iterations);
   }
 
   mapValue = (num: number, in_min: number, in_max: number, out_min: number, out_max: number) => (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 
-  drawMandelbrotWithWebworkers(ctx: CanvasRenderingContext2D, numberOfWorkers: number){
-
-
+  drawMandelbrotWithWebworkers(ctx: CanvasRenderingContext2D, numberOfWorkers: number): void {
     const numberOfpixelsPerBatch = Math.round(this.height / numberOfWorkers)
-
     for (let y = 0; y < this.height; y = y + numberOfpixelsPerBatch) {
-
-      this.workerTest(y, numberOfpixelsPerBatch, ctx);
-
+      this.dispatchWorker(y, numberOfpixelsPerBatch, ctx);
     }
-
-
-
   }
 
-  drawMandelbrotSingleThreaded(ctx: CanvasRenderingContext2D ){
-
+  drawMandelbrotSingleThreaded(ctx: CanvasRenderingContext2D): void {
+    let computedResult: ComputedResult[] = [];
     const startTime = performance.now();
 
     for (let y = 0; y < this.height; y++) {
@@ -74,7 +66,7 @@ export class MandelbrotService {
 
         let iterationCount = 0;
 
-        while (iterationCount < this.maxIterations.value) {
+        for (let iterationCount = 0; iterationCount < this.maxIterations.value; iterationCount++) {
 
           //Echt component
           let aa = (a * a) - (b * b);
@@ -89,62 +81,62 @@ export class MandelbrotService {
           //We willen de absolute waarde
           let result = Math.abs(a + b);
 
-          this.brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 0, 255);
-
           //Is het oneindig?
           if (result >= this.infinity) {
 
-            //Niet in de set
-            // this.brightness = (iterationCount * 4 ) % 255;
-            ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
+            //Not in set
+            const brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 0, 255);
+            computedResult.push({brightness: brightness, x: x, y: y, inSet: false});
+            break;
 
           } else {
 
-            //Wel in de set
-            this.brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 255, 0);
-            ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
+            //In Set
+            const brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 255, 0);
+            if (iterationCount === this.maxIterations.value - 1) {
+              computedResult.push({brightness: brightness, x: x, y: y, inSet: true});
+            }
           }
-
-          iterationCount++;
         }
-        ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
-        ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
       }
-      ctx.fillRect(y * this.pixelSize, x * this.pixelSize, this.pixelSize, this.pixelSize);
     }
+
+    this.fillCanvas(ctx, computedResult);
+
+    //End time calculation
     const endTime = performance.now();
     const totalTime = endTime - startTime;
     this.calculationTime.next(totalTime);
+  }
 
+  private fillCanvas(ctx: CanvasRenderingContext2D, result: ComputedResult[]): void {
+    result.map(part => {
+      ctx.fillStyle = 'rgb(' + part.brightness + ', ' + part.brightness + ', ' + part.brightness + ')';
+      ctx.fillRect(part.y * this.pixelSize, part.x * this.pixelSize, this.pixelSize, this.pixelSize);
+    });
   }
 
 
-
-  async workerTest(initialY: number, pixels: number, ctx: CanvasRenderingContext2D){
+  async dispatchWorker(initialY: number, pixels: number, ctx: CanvasRenderingContext2D) {
     const startTime = performance.now();
     if (typeof Worker !== 'undefined') {
       const worker = new Worker(new URL('../webworkers/mandelbrot.worker', import.meta.url),
         {type: 'module'});
+        worker.onmessage = ({data}) => {
 
-      worker.onmessage = ({data}) => {
+        //Fill canvas with result
+        this.fillCanvas(ctx, data);
+
+        //Stop time
         const endTime = performance.now();
         const totalTime = endTime - startTime;
         this.calculationTime.next(totalTime);
-        const mapPart : ComputedResult[] = data;
-        mapPart.map(part => {
-          if(part.inSet){
-            ctx.fillStyle = 'rgb(' + part.brightness + ', ' + part.brightness + ', ' + part.brightness + ')';
-            ctx.fillRect(part.y * this.pixelSize, part.x * this.pixelSize, this.pixelSize, this.pixelSize);
-          }else {
-
-          }
-        });
 
         worker.terminate();
       };
 
       worker.postMessage({
-        y: initialY,
+        initialY: initialY,
         pixels: pixels,
         width: this.width,
         height: this.height,
