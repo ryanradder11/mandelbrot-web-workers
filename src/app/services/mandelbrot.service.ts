@@ -64,8 +64,6 @@ export class MandelbrotService {
         let initialA = a;
         let initialB = b;
 
-        let iterationCount = 0;
-
         for (let iterationCount = 0; iterationCount < this.maxIterations.value; iterationCount++) {
 
           //Echt component
@@ -101,19 +99,23 @@ export class MandelbrotService {
       }
     }
 
-    this.fillCanvas(ctx, computedResult);
+    this.fillCanvas(ctx, computedResult).then( _ =>{
+      //End time calculation
+      const endTime = performance.now();
+      const totalTime = endTime - startTime;
+      this.calculationTime.next(totalTime);
+    });
 
-    //End time calculation
-    const endTime = performance.now();
-    const totalTime = endTime - startTime;
-    this.calculationTime.next(totalTime);
   }
 
-  private fillCanvas(ctx: CanvasRenderingContext2D, result: ComputedResult[]): void {
-    result.map(part => {
-      ctx.fillStyle = 'rgb(' + part.brightness + ', ' + part.brightness + ', ' + part.brightness + ')';
-      ctx.fillRect(part.y * this.pixelSize, part.x * this.pixelSize, this.pixelSize, this.pixelSize);
-    });
+  private fillCanvas(ctx: CanvasRenderingContext2D, result: ComputedResult[]): Promise<void> {
+    return  new Promise( (resolve) => {
+      result.map(part => {
+        ctx.fillStyle = 'rgb(' + part.brightness + ', ' + part.brightness + ', ' + part.brightness + ')';
+        ctx.fillRect(part.y * this.pixelSize, part.x * this.pixelSize, this.pixelSize, this.pixelSize);
+      });
+      resolve();
+    })
   }
 
 
@@ -125,14 +127,15 @@ export class MandelbrotService {
         worker.onmessage = ({data}) => {
 
         //Fill canvas with result
-        this.fillCanvas(ctx, data);
+        this.fillCanvas(ctx, data).then(_ => {
+          //Stop time
+          const endTime = performance.now();
+          const totalTime = endTime - startTime;
+          this.calculationTime.next(totalTime);
 
-        //Stop time
-        const endTime = performance.now();
-        const totalTime = endTime - startTime;
-        this.calculationTime.next(totalTime);
-
-        worker.terminate();
+          //Terminate worker
+          worker.terminate();
+        });
       };
 
       worker.postMessage({

@@ -19,13 +19,28 @@
           <mat-option [value]="150">150 iterations</mat-option>
           <mat-option [value]="200">200 iterations</mat-option>
           <mat-option [value]="250">250 iterations</mat-option>
+          <mat-option [value]="500">500 iterations</mat-option>
+          <mat-option [value]="1000">1000 iterations</mat-option>
+          <mat-option [value]="1500">1500 iterations</mat-option>
         </mat-select>
       </div>
       <div>
         <mat-label>Webworkers</mat-label>
         <mat-select [(value)]="selectedMode" (selectionChange)="useWebworkers($event.value)">
-          <mat-option  [value]="false">off</mat-option>
+          <mat-option [value]="false">off</mat-option>
           <mat-option [value]="true">on</mat-option>
+        </mat-select>
+      </div>
+      <div *ngIf="selectedMode">
+        <mat-label>Webworkers</mat-label>
+        <mat-select [(value)]="numberOfWorkers" (selectionChange)="setNumerOfWebworkers($event.value)">
+          <mat-option [value]="1">1</mat-option>
+          <mat-option [value]="2">2</mat-option>
+          <mat-option [value]="3">3</mat-option>
+          <mat-option [value]="4">5</mat-option>
+          <mat-option [value]="5">5</mat-option>
+          <mat-option [value]="6">6</mat-option>
+          <mat-option [value]="7">7</mat-option>
         </mat-select>
       </div>
       <div>

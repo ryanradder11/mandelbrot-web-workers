@@ -13,22 +13,19 @@ export class CanvasComponent implements  AfterViewInit {
   mode: BehaviorSubject<boolean> = new BehaviorSubject(false);
   selectedMode= false;
   selectedIterations = 25;
+  numberOfWorkers = 1;
 
   constructor(@Inject(DOCUMENT) private doc: Document,
               public mandelbrotService: MandelbrotService) {
   }
 
-
-  // async generateSection(){
-  //   for(let i = 0 ; i< 100 ; i++){
-  //     await this.mandelbrotService.workerTest(i+'');
-  //   }
-  // }
-
-
-
   useWebworkers(status: boolean){
     this.mode.next(status);
+    this.drawMandelbrot();
+  }
+
+  setNumerOfWebworkers(numberOfWorkers: number){
+    this.numberOfWorkers =numberOfWorkers;
     this.drawMandelbrot();
   }
 
@@ -49,10 +46,9 @@ export class CanvasComponent implements  AfterViewInit {
 
   private drawMandelbrot(): void{
     if (this.ctx) {
-
       this.ctx.clearRect(0,0, 700, 700);
       if(this.mode.value){
-        this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, 4);
+        this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, this.numberOfWorkers);
       }else {
         this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
       }

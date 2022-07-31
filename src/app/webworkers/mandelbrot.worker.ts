@@ -18,7 +18,6 @@ addEventListener('message', ({data}) => {
 
       for (let iterationCount = 0; iterationCount < data.maxIterations; iterationCount++) {
 
-
         //Echt component
         let aa = (a * a) - (b * b);
 
