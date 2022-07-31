@@ -26,12 +26,12 @@
       </div>
       <div>
         <mat-label>Webworkers</mat-label>
-        <mat-select [(value)]="selectedMode" (selectionChange)="useWebworkers($event.value)">
+        <mat-select [(value)]="_useWorkers" (selectionChange)="setUseWebworkers($event.value)">
           <mat-option [value]="false">off</mat-option>
           <mat-option [value]="true">on</mat-option>
         </mat-select>
       </div>
-      <div *ngIf="selectedMode">
+      <div *ngIf="useWorkers.value">
         <mat-label>Webworkers</mat-label>
         <mat-select [(value)]="numberOfWorkers" (selectionChange)="setNumerOfWebworkers($event.value)">
           <mat-option [value]="1">1</mat-option>

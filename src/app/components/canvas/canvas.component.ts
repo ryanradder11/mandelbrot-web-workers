@@ -10,8 +10,8 @@ import {BehaviorSubject} from "rxjs";
 })
 export class CanvasComponent implements  AfterViewInit {
   ctx: CanvasRenderingContext2D | null | undefined;
-  mode: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  selectedMode= false;
+  useWorkers: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  _useWorkers = false;
   selectedIterations = 25;
   numberOfWorkers = 1;
 
@@ -19,8 +19,9 @@ export class CanvasComponent implements  AfterViewInit {
               public mandelbrotService: MandelbrotService) {
   }
 
-  useWebworkers(status: boolean){
-    this.mode.next(status);
+  setUseWebworkers(useWorkers: boolean){
+    this.useWorkers.next(useWorkers);
+    this._useWorkers = useWorkers;
     this.drawMandelbrot();
   }
 
@@ -47,7 +48,7 @@ export class CanvasComponent implements  AfterViewInit {
   private drawMandelbrot(): void{
     if (this.ctx) {
       this.ctx.clearRect(0,0, 700, 700);
-      if(this.mode.value){
+      if(this.useWorkers.value){
         this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, this.numberOfWorkers);
       }else {
         this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
