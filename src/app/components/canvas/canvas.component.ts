@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, Inject, OnInit} from '@angular/core';
 import {MandelbrotService} from "../../services/mandelbrot.service";
 import {DOCUMENT} from "@angular/common";
+import {BehaviorSubject} from "rxjs";
 
 @Component({
   selector: 'app-canvas',
@@ -9,9 +10,11 @@ import {DOCUMENT} from "@angular/common";
 })
 export class CanvasComponent implements  AfterViewInit {
   ctx: CanvasRenderingContext2D | null | undefined;
+  mode: BehaviorSubject<boolean> = new BehaviorSubject(false);
   constructor(@Inject(DOCUMENT) private doc: Document,
               public mandelbrotService: MandelbrotService) {
   }
+
 
   // async generateSection(){
   //   for(let i = 0 ; i< 100 ; i++){
@@ -21,6 +24,10 @@ export class CanvasComponent implements  AfterViewInit {
 
 
 
+  useWebworkers(status: boolean){
+    this.mode.next(status);
+    this.drawMandelbrot();
+  }
 
   zoomIn(){
     this.mandelbrotService.zoomin();
@@ -41,8 +48,11 @@ export class CanvasComponent implements  AfterViewInit {
     if (this.ctx) {
 
       this.ctx.clearRect(0,0, 700, 700);
-      // this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
-      this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, 7);
+      if(this.mode.value){
+        this.mandelbrotService.drawMandelbrotWithWebworkers(this.ctx, 7);
+      }else {
+        this.mandelbrotService.drawMandelbrotSingleThreaded(this.ctx);
+      }
     }
   }
 

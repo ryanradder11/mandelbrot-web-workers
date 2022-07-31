@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject} from "rxjs";
 import {MatSelectChange} from "@angular/material/select";
+import {ComputedResult} from "../interfaces/computed-result";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class MandelbrotService {
 
    public mandelMin = -2.5;
    public mandelMax = 2.5;
-   infinity = 400;
+   infinity = 9999;
    pixelSize = 1
    brightness = 1;
    width = 700;
@@ -88,17 +89,19 @@ export class MandelbrotService {
           //We willen de absolute waarde
           let result = Math.abs(a + b);
 
+          this.brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 0, 255);
+
           //Is het oneindig?
           if (result >= this.infinity) {
 
             //Niet in de set
-            this.brightness = (iterationCount * 4 ) % 255;
+            // this.brightness = (iterationCount * 4 ) % 255;
             ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
 
           } else {
 
             //Wel in de set
-            this.brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 255, 50);
+            this.brightness = this.mapValue(iterationCount, 0, this.maxIterations.value, 255, 0);
             ctx.fillStyle = 'rgb(' + this.brightness + ', ' + this.brightness + ', ' + this.brightness + ')';
           }
 
@@ -127,7 +130,7 @@ export class MandelbrotService {
         const endTime = performance.now();
         const totalTime = endTime - startTime;
         this.calculationTime.next(totalTime);
-        const mapPart : { brightness: number, x: number, y: number, inSet: boolean }[] = data;
+        const mapPart : ComputedResult[] = data;
         mapPart.map(part => {
           if(part.inSet){
             ctx.fillStyle = 'rgb(' + part.brightness + ', ' + part.brightness + ', ' + part.brightness + ')';

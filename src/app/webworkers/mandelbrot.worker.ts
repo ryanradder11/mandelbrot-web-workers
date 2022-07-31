@@ -1,11 +1,12 @@
 /// <reference lib="webworker" />
 
 import {map} from "rxjs";
+import {ComputedResult} from "../interfaces/computed-result";
 
 addEventListener('message', ({ data }) => {
 
   const mapValue = (num: number, in_min: number, in_max: number, out_min: number, out_max: number) => (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-  let computedResult: {brightness:number, x: number, y: number, inSet: boolean}[] = [];
+  let computedResult: ComputedResult[] = [];
   for (let y = data.y; y < data.height; y++ ) {
     let x;
     for (x = 0; x < data.width; x++) {
@@ -37,8 +38,6 @@ addEventListener('message', ({ data }) => {
           //Is het oneindig?
           if (result >= data.infinity) {
 
-            //Niet in de set
-            // const brightness =  255;
             if(iterationCount === data.maxIterations -1) {
               computedResult.push({brightness: brightness, x: x, y: y, inSet: false});
             }
